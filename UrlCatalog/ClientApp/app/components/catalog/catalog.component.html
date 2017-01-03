@@ -1,0 +1,20 @@
+﻿<h1>Catalog of url's</h1>
+
+<p>List of interesting posts about AI</p>
+
+<p *ngIf="!urls">Loading urls...</p>
+
+<table class='table' *ngIf="urls">
+    <thead>
+        <tr>
+            <td>Title</td>
+            <td>Published</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let url of urls">
+            <td>{{url.title}}</td>
+            <td>{{url.publishedDate}}</td>
+        </tr>
+    </tbody>
+</table>
