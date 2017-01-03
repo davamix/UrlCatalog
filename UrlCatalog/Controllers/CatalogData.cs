@@ -18,5 +18,28 @@ namespace UrlCatalog.Controllers
 
             return service.GetBlogPosts();
         }
+
+        [HttpPost("[action]")]
+        public void Add(BlogPost blogPost)
+        {
+            var service = new CatalogService();
+
+            service.Save(blogPost);
+        }
+
+        [HttpPut("[action]")]
+        public void Update(BlogPost blogPost)
+        {
+            var service = new CatalogService();
+
+            service.Save(blogPost);
+        }
+
+        public void Delete(BlogPost blogPost)
+        {
+            var service = new CatalogService();
+
+            service.Delete(blogPost);
+        }
     }
 }

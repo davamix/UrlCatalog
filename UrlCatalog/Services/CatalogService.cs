@@ -20,5 +20,22 @@ namespace UrlCatalog.Services
         {
             return _dataAccess.GetBlogPosts();
         }
+
+        public void Save(BlogPost blogPost)
+        {
+            if (blogPost.Id > 0)
+            {
+                _dataAccess.Update(blogPost);
+                return;
+            }
+            
+            _dataAccess.Add(blogPost);
+        }
+
+        public void Delete(BlogPost blogPost)
+        {
+            if (blogPost != null)
+                _dataAccess.Delete(blogPost);
+        }
     }
 }
