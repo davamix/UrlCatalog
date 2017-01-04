@@ -11,16 +11,20 @@ namespace UrlCatalog.DataAccess
 {
     public class CatalogDataAccess
     {
+        private const string DB_NAME = "UrlCatalogDB";
+        private const string DB_TABLE = "BlogPost";
+
         private string _connectionString;
 
-        public IDbConnection Connection=>new SqliteConnection(_connectionString);
+        public IDbConnection Connection => new SqliteConnection(_connectionString);
 
         public CatalogDataAccess()
         {
-            _connectionString = @"Data Source=UrlCatalogDB";
+            _connectionString = $"Data Source={DB_NAME}";
             CreateDataTables();
 
             //AddTestData();
+            //AddColumns();
         }
 
         private void CreateDataTables()
@@ -28,11 +32,11 @@ namespace UrlCatalog.DataAccess
             using (IDbConnection connection = Connection)
             {
                 //BlogPost table (Id, Title, Published_Date)
-                connection.Execute("CREATE TABLE IF NOT EXISTS BlogPost(Id INTEGER PRIMARY KEY NOT NULL, Title TEXT, Published_Date INTEGER)");
+                connection.Execute($"CREATE TABLE IF NOT EXISTS {DB_TABLE}(Id INTEGER PRIMARY KEY NOT NULL, Title TEXT, Published_Date INTEGER)");
             }
         }
 
-       
+
 
         public IEnumerable<BlogPost> GetBlogPosts()
         {
@@ -47,7 +51,7 @@ namespace UrlCatalog.DataAccess
         {
             using (IDbConnection connection = Connection)
             {
-                var query = "INSERT INTO BlogPost(Title, Published_Date) VALUE(@Title, @PublishedDate)";
+                var query = $"INSERT INTO {DB_TABLE}(Title, Published_Date) VALUE(@Title, @PublishedDate)";
 
                 RunQuery(connection, query, blogPost);
             }
@@ -57,7 +61,7 @@ namespace UrlCatalog.DataAccess
         {
             using (IDbConnection connection = Connection)
             {
-                var query = "UPDATE BlogPost SET Title = @Title, Published_Date = @PublishedDate WHERE id = @Id";
+                var query = $"UPDATE {DB_TABLE} SET Title = @Title, Published_Date = @PublishedDate WHERE id = @Id";
 
                 RunQuery(connection, query, blogPost);
             }
@@ -65,9 +69,9 @@ namespace UrlCatalog.DataAccess
 
         public void Delete(BlogPost blogPost)
         {
-            using(IDbConnection connection = Connection)
+            using (IDbConnection connection = Connection)
             {
-                var query = "DELETE BlogPost WHERE id = @Id";
+                var query = $"DELETE {DB_TABLE} WHERE id = @Id";
 
                 RunQuery(connection, query, blogPost);
             }
@@ -87,13 +91,34 @@ namespace UrlCatalog.DataAccess
 
             using (IDbConnection connection = Connection)
             {
-                var query = "INSERT INTO BlogPost(Title, Published_Date) Values(@Title, @PublishedDate)";
+                var query = $"INSERT INTO {DB_TABLE}(Title, Published_Date) Values(@Title, @PublishedDate)";
                 connection.Open();
 
                 connection.Execute(query, bp1);
                 connection.Execute(query, bp2);
             }
         }
+
+        public void AddColumns()
+        {
+            var columns = new Dictionary<string, string> {
+                { "Url", "TEXT" },
+                { "Comments", "TEXT" },
+                {"ReadDate", "TEXT"}
+            };
+
+            using (IDbConnection connection = Connection)
+            {
+                connection.Open();
+
+                foreach (var column in columns)
+                {
+                    var query = $"ALTER TABLE {DB_TABLE} ADD {column.Key} {column.Value}";
+                    connection.Execute(query);
+                }
+            }
+        }
+
         #endregion
     }
 }

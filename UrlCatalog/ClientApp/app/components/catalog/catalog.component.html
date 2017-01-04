@@ -5,7 +5,25 @@
 <table class='table'>
     <tbody>
         <tr>
-            <td>Title <input #title_box /></td>
+            <td>Title <input [value]="blogPost.title" (input)="blogPost.title = $event.target.value" /></td>
+        </tr>
+        <tr>
+            <td>Published date <input [value]="blogPost.publishedDate" (input)="blogPost.publishedDate = $event.target.value" /> </td>
+        </tr>
+        <tr>
+            <td>Url <input [value]="blogPost.url" (input)="blogPost.url = $event.target.value" /></td>
+        </tr>
+        <tr>
+            <td>Comments <input [value]="blogPost.comments" (input)="blogPost.comment = $event.target.value" /></td>
+        </tr>
+        <tr>
+            <td>Read date <input [value]="blogPost.readDate" (input)="blogPost.readDate = $event.target.value" /></td>
+        </tr>
+        <tr>
+            <td>
+                <button (click)="saveUrl()">Save</button>
+                <button (click)="clearUrl()">Clear</button>
+            </td>
         </tr>
     </tbody>
 </table>
