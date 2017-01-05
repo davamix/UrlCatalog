@@ -9,18 +9,18 @@ using UrlCatalog.Services;
 namespace UrlCatalog.Controllers
 {
     [Route("api/[controller]")]
-    public class CatalogData : Controller
+    public class CatalogController : Controller
     {
-        [HttpGet("[action]")]
-        public IEnumerable<BlogPost> BlogPosts()
+        [HttpGet]
+        public IEnumerable<BlogPost> GetCatalog()
         {
             var service = new CatalogService();
 
             return service.GetBlogPosts();
         }
 
-        [HttpPost("[action]")]
-        public void Add(BlogPost blogPost)
+        [HttpPost]
+        public void PostCatalog([FromBody]BlogPost blogPost)
         {
             var service = new CatalogService();
 
@@ -35,6 +35,7 @@ namespace UrlCatalog.Controllers
             service.Save(blogPost);
         }
 
+        [HttpDelete]
         public void Delete(BlogPost blogPost)
         {
             var service = new CatalogService();

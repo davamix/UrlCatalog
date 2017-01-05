@@ -9,35 +9,50 @@ using UrlCatalog.Models;
 
 namespace UrlCatalog.DataAccess
 {
+    internal class BlogPostTable
+    {
+        public string DbName => "UrlCatalogDB";
+        public string TableName => "BlogPost";
+        public Dictionary<string, string> Columns => new Dictionary<string, string>
+        {
+            {"Id", "INTERGER PRIMARY KEY NOT NULL"},
+            {"Title", "TEXT"},
+            {"Published_Date", "TEXT"},
+            {"Url", "TEXT"},
+            {"Comments", "TEXT"},
+            {"Read_Date", "TEXT"}
+        };
+    }
+
     public class CatalogDataAccess
     {
-        private const string DB_NAME = "UrlCatalogDB";
-        private const string DB_TABLE = "BlogPost";
-
         private string _connectionString;
+        private readonly BlogPostTable _blogPostTable;
 
         public IDbConnection Connection => new SqliteConnection(_connectionString);
 
         public CatalogDataAccess()
         {
-            _connectionString = $"Data Source={DB_NAME}";
+            _blogPostTable = new BlogPostTable();
+
+            _connectionString = $"Data Source={_blogPostTable.DbName}";
             CreateDataTables();
 
             //AddTestData();
-            //AddColumns();
         }
 
         private void CreateDataTables()
         {
+            var columns = _blogPostTable.Columns.Select(x => x.Key + " " + x.Value).Aggregate((c, v) => c + ", " + v);
+            var query = $"CREATE TABLE IF NOT EXISTS {_blogPostTable.TableName}({columns})";
+
             using (IDbConnection connection = Connection)
             {
-                //BlogPost table (Id, Title, Published_Date)
-                connection.Execute($"CREATE TABLE IF NOT EXISTS {DB_TABLE}(Id INTEGER PRIMARY KEY NOT NULL, Title TEXT, Published_Date INTEGER)");
+                connection.Open();
+                connection.Execute(query);
             }
         }
-
-
-
+        
         public IEnumerable<BlogPost> GetBlogPosts()
         {
             using (IDbConnection connection = Connection)
@@ -51,7 +66,7 @@ namespace UrlCatalog.DataAccess
         {
             using (IDbConnection connection = Connection)
             {
-                var query = $"INSERT INTO {DB_TABLE}(Title, Published_Date) VALUE(@Title, @PublishedDate)";
+                var query = $"INSERT INTO {_blogPostTable.TableName}(Title, Published_Date) VALUE(@Title, @PublishedDate)";
 
                 RunQuery(connection, query, blogPost);
             }
@@ -61,7 +76,7 @@ namespace UrlCatalog.DataAccess
         {
             using (IDbConnection connection = Connection)
             {
-                var query = $"UPDATE {DB_TABLE} SET Title = @Title, Published_Date = @PublishedDate WHERE id = @Id";
+                var query = $"UPDATE {_blogPostTable.TableName} SET Title = @Title, Published_Date = @PublishedDate WHERE id = @Id";
 
                 RunQuery(connection, query, blogPost);
             }
@@ -71,7 +86,7 @@ namespace UrlCatalog.DataAccess
         {
             using (IDbConnection connection = Connection)
             {
-                var query = $"DELETE {DB_TABLE} WHERE id = @Id";
+                var query = $"DELETE {_blogPostTable.TableName} WHERE id = @Id";
 
                 RunQuery(connection, query, blogPost);
             }
@@ -91,34 +106,13 @@ namespace UrlCatalog.DataAccess
 
             using (IDbConnection connection = Connection)
             {
-                var query = $"INSERT INTO {DB_TABLE}(Title, Published_Date) Values(@Title, @PublishedDate)";
+                var query = $"INSERT INTO {_blogPostTable.DbName}(Title, Published_Date) Values(@Title, @PublishedDate)";
                 connection.Open();
 
                 connection.Execute(query, bp1);
                 connection.Execute(query, bp2);
             }
         }
-
-        public void AddColumns()
-        {
-            var columns = new Dictionary<string, string> {
-                { "Url", "TEXT" },
-                { "Comments", "TEXT" },
-                {"ReadDate", "TEXT"}
-            };
-
-            using (IDbConnection connection = Connection)
-            {
-                connection.Open();
-
-                foreach (var column in columns)
-                {
-                    var query = $"ALTER TABLE {DB_TABLE} ADD {column.Key} {column.Value}";
-                    connection.Execute(query);
-                }
-            }
-        }
-
         #endregion
     }
 }
